@@ -66,7 +66,7 @@ func (s *Server) DecreaseStock(ctx context.Context, req *pb.DecreaseStockRequest
 		}, nil
 	}
 
-	if product.Stock <= 0 {
+	if product.Stock-req.Quantity < 0 {
 		return &pb.DecreaseStockResponse{
 			Status: http.StatusConflict,
 			Error:  "Stock too low",
@@ -82,7 +82,7 @@ func (s *Server) DecreaseStock(ctx context.Context, req *pb.DecreaseStockRequest
 		}, nil
 	}
 
-	product.Stock = product.Stock - 1
+	product.Stock = product.Stock - req.Quantity
 
 	s.H.DB.Save(&product)
 
