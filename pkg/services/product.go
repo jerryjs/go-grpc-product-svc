@@ -95,3 +95,22 @@ func (s *Server) DecreaseStock(ctx context.Context, req *pb.DecreaseStockRequest
 		Status: http.StatusOK,
 	}, nil
 }
+
+func (s *Server) AddStock(ctx context.Context, req *pb.AddStockRequest) (*pb.AddStockResponse, error) {
+	var product models.Product
+
+	if result := s.H.DB.First(&product, req.Id); result.Error != nil {
+		return &pb.AddStockResponse{
+			Status: http.StatusNotFound,
+			Error:  result.Error.Error(),
+		}, nil
+	}
+
+	product.Stock = product.Stock + req.Stock
+
+	s.H.DB.Save(&product)
+
+	return &pb.AddStockResponse{
+		Status: http.StatusOK,
+	}, nil
+}
